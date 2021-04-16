@@ -5,7 +5,6 @@ import ReactDOM from "react-dom";
 import "./index.css";
 
 import Nav from "./components/Nav";
-import Card from "./components/Card";
 import Exchanger from "./components/Exchanger";
 
 class App extends React.Component {
@@ -13,9 +12,7 @@ class App extends React.Component {
         return (
             <div>
                 <Nav />
-                <Card>
-                    <Exchanger />
-                </Card>
+                <Exchanger />
             </div>
         );
     }
