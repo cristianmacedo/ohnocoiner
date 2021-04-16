@@ -1,0 +1,44 @@
+html,
+body,
+#app {
+    height: 100%;
+    width: 100%;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Poppins", sans-serif;
+    background-image: linear-gradient(0deg, #667eea 0%, #66a6ff 100%);
+}
+
+.text-center {
+    text-align: center;
+}
+
+.bold {
+    font-weight: 700;
+}
+
+.logo {
+    font-size: 2em;
+    color: white;
+}
+
+.center {
+    margin: 0 auto;
+}
+
+.card {
+    max-width: 860px;
+    border-radius: 10px;
+    background-color: white;
+}
+
+.p-1 {
+    padding: 1em;
+}
