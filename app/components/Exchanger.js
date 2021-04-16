@@ -16,11 +16,16 @@ export default class Exchanger extends React.Component {
 
         this.state = {
             cashCode: "USD",
-            cryptoCode: "BTC",
             cashValue: 0,
+            cryptoCode: "BTC",
             cryptoValue: 1,
+            cryptoPrices: {
+                BTC: {
+                    USD: {},
+                },
+            },
             currentCryptoPrice: 0,
-            historicalDate: this.todayDate,
+            historicalDate: "2015-01-01",
             historicalCryptoPrice: 0,
         };
 
@@ -30,15 +35,29 @@ export default class Exchanger extends React.Component {
     }
 
     componentDidMount() {
+        this.updateCurrentPrice();
+        this.updateHistoricalPrice();
+    }
+
+    updateCurrentPrice() {
         fetchCurrentPrice(this.state.cashCode).then((data) => {
-            const currentCryptoPrice =
-                data["bpi"][this.state.cashCode]["rate_float"];
-            this.setState({ currentCryptoPrice });
+            const { cryptoPrices } = this.state;
+            cryptoPrices[this.state.cryptoCode][this.state.cashCode][
+                this.todayDate
+            ] = data["bpi"][this.state.cashCode]["rate_float"];
+            this.setState({ cryptoPrices });
         });
+    }
+
+    updateHistoricalPrice() {
         fetchHistoricalPrice(this.state.historicalDate).then((data) => {
-            const historicalCryptoPrice =
-                data["bpi"][this.state.historicalDate];
-            this.setState({ historicalCryptoPrice });
+            const { cryptoPrices } = this.state;
+            cryptoPrices[this.state.cryptoCode][this.state.cashCode] = {
+                ...cryptoPrices[this.state.cryptoCode][this.state.cashCode],
+                ...data["bpi"],
+            };
+            console.log("newCryptoPrices", cryptoPrices);
+            this.setState({ cryptoPrices });
         });
     }
 
@@ -46,7 +65,10 @@ export default class Exchanger extends React.Component {
         this.setState((currentState) => ({
             cashValue: e.target.value,
             cryptoValue: (
-                e.target.value / currentState.historicalCryptoPrice
+                e.target.value /
+                currentState.cryptoPrices[currentState.cryptoCode][
+                    currentState.cashCode
+                ][currentState.historicalDate]
             ).toFixed(8),
         }));
     }
@@ -55,13 +77,24 @@ export default class Exchanger extends React.Component {
         this.setState((currentState) => ({
             cryptoValue: e.target.value,
             cashValue: (
-                e.target.value * currentState.historicalCryptoPrice
+                e.target.value *
+                currentState.cryptoPrices[currentState.cryptoCode][
+                    currentState.cashCode
+                ][currentState.historicalDate]
             ).toFixed(2),
         }));
     }
 
     handleDateChange(e) {
-        this.setState({ historicalDate: e.target.value });
+        this.setState({ historicalDate: e.target.value }, () => {
+            const dateExists = this.state.cryptoPrices[this.state.cryptoCode][
+                this.state.cashCode
+            ][this.state.historicalDate];
+            console.log("dateExists", dateExists);
+            if (!dateExists) {
+                this.updateHistoricalPrice();
+            }
+        });
     }
 
     render() {
@@ -85,7 +118,7 @@ export default class Exchanger extends React.Component {
                         name="price-date"
                         min={this.apiFirstDate}
                         max={this.todayDate}
-                        value={this.historicalDate}
+                        value={this.state.historicalDate}
                         onDateChange={this.handleDateChange}
                     />
                 </Card>
@@ -94,7 +127,9 @@ export default class Exchanger extends React.Component {
                     <h2 className="text-center font-size-bg">
                         {`${this.state.cashCode} ${(
                             this.state.cryptoValue *
-                            this.state.currentCryptoPrice
+                            this.state.cryptoPrices[this.state.cryptoCode][
+                                this.state.cashCode
+                            ][this.state.historicalDate]
                         ).toFixed(2)}`}
                     </h2>
                 </Card>
