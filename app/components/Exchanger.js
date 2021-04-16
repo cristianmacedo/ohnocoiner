@@ -1,27 +1,32 @@
 import React from "react";
 
 import Card from "./Card";
-
+import DatePicker from "./DatePicker";
 import Currency from "./Currency";
 
 import { fetchCurrentPrice, fetchHistoricalPrice } from "../utils/api";
+import date from "../utils/date";
 
 export default class Exchanger extends React.Component {
     constructor(props) {
         super(props);
 
+        this.todayDate = new Date().addDays(-1).toSimple();
+        this.apiFirstDate = "2010-07-17";
+
         this.state = {
             cashCode: "USD",
             cryptoCode: "BTC",
             cashValue: 0,
-            cryptoValue: 0,
+            cryptoValue: 1,
             currentCryptoPrice: 0,
-            historicalDate: "2015-01-01",
+            historicalDate: this.todayDate,
             historicalCryptoPrice: 0,
         };
 
         this.handleCashValueChange = this.handleCashValueChange.bind(this);
         this.handleCryptoValueChange = this.handleCryptoValueChange.bind(this);
+        this.handleDateChange = this.handleDateChange.bind(this);
     }
 
     componentDidMount() {
@@ -55,6 +60,10 @@ export default class Exchanger extends React.Component {
         }));
     }
 
+    handleDateChange(e) {
+        this.setState({ historicalDate: e.target.value });
+    }
+
     render() {
         return (
             <React.Fragment>
@@ -71,7 +80,14 @@ export default class Exchanger extends React.Component {
                         value={this.state.cryptoValue}
                         onValueChange={this.handleCryptoValueChange}
                     />
-                    <p className="mt-1">in {this.state.historicalDate}.</p>
+                    <p className="mt-1">in</p>
+                    <DatePicker
+                        name="price-date"
+                        min={this.apiFirstDate}
+                        max={this.todayDate}
+                        value={this.historicalDate}
+                        onDateChange={this.handleDateChange}
+                    />
                 </Card>
                 <Card>
                     <p>Today you would have:</p>
