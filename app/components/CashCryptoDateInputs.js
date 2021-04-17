@@ -3,12 +3,14 @@ import PropTypes from "prop-types";
 
 import Card from "./Card";
 import DatePicker from "./DatePicker";
-import Currency from "./Currency";
+import CurrencyInput from "./CurrencyInput";
 
 export default function CashCryptoDateInputs({
     cashValue,
     cashCode,
     onCashChange,
+    supportedCash,
+    onCurrencyChange,
     cryptoValue,
     cryptoCode,
     onCryptoChange,
@@ -21,15 +23,17 @@ export default function CashCryptoDateInputs({
         <Card>
             <p>If you had bought</p>
             {(cashValue === 0 || cashValue) && (
-                <Currency
+                <CurrencyInput
                     name={cashCode}
                     value={cashValue}
                     onValueChange={(e) => onCashChange(e.target.value)}
+                    onCurrencyChange={(e) => onCurrencyChange(e.target.value)}
+                    currencies={supportedCash}
                 />
             )}
             <p className="mt-1">worth of</p>
             {(cryptoValue === 0 || cryptoValue) && (
-                <Currency
+                <CurrencyInput
                     name={cryptoCode}
                     value={cryptoValue}
                     onValueChange={(e) => onCryptoChange(e.target.value)}
@@ -51,6 +55,7 @@ CashCryptoDateInputs.propTypes = {
     cashValue: PropTypes.number,
     cashCode: PropTypes.string,
     onCashChange: PropTypes.func,
+    onCurrencyChange: PropTypes.func,
     cryptoValue: PropTypes.number,
     cryptoCode: PropTypes.string,
     onCryptoChange: PropTypes.func,

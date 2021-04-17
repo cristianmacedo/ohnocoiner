@@ -31,10 +31,15 @@ export default class Exchanger extends React.Component {
         this.updateCashValue = this.updateCashValue.bind(this);
         this.updateCryptoValue = this.updateCryptoValue.bind(this);
         this.updateHistoricalPrice = this.updateHistoricalPrice.bind(this);
+        this.updateSupportedCurrencies = this.updateSupportedCurrencies.bind(
+            this
+        );
+        this.updateCurrency = this.updateCurrency.bind(this);
         this.isLoading = this.isLoading.bind(this);
     }
 
     componentDidMount() {
+        this.updateSupportedCurrencies();
         this.updateHistoricalPrice(this.state.todayDate);
         this.updateHistoricalPrice(this.state.historicalDate);
     }
@@ -49,13 +54,28 @@ export default class Exchanger extends React.Component {
         return historicalDate in cryptoPrices[cryptoCode][cashCode];
     }
 
+    updateSupportedCurrencies() {
+        fetchSupportedCurrencies().then((data) =>
+            this.setState({ supportedCurrencies: data })
+        );
+    }
+
+    updateCurrency(selectedCurrency) {
+        const { cryptoPrices, cryptoCode, todayDate } = this.state;
+        cryptoPrices[cryptoCode][selectedCurrency] = {};
+        this.setState({ cryptoPrices, cashCode: selectedCurrency }, () => {
+            this.updateHistoricalPrice(this.state.todayDate);
+            this.updateHistoricalPrice(this.state.historicalDate);
+        });
+    }
+
     async updateHistoricalPrice(selectedDate) {
         const { cashCode, cashValue, cryptoCode, cryptoPrices } = this.state;
 
         const dateExists = selectedDate in cryptoPrices[cryptoCode][cashCode];
 
         if (!dateExists) {
-            const data = await fetchHistoricalPrice(selectedDate);
+            const data = await fetchHistoricalPrice(selectedDate, cashCode);
             cryptoPrices[cryptoCode][cashCode] = {
                 ...cryptoPrices[cryptoCode][cashCode],
                 ...data["bpi"],
@@ -120,6 +140,7 @@ export default class Exchanger extends React.Component {
             historicalDate,
             apiFirstDate,
             todayDate,
+            supportedCurrencies,
         } = this.state;
 
         return (
@@ -127,6 +148,8 @@ export default class Exchanger extends React.Component {
                 <CashCryptoDateInputs
                     cashValue={cashValue}
                     cashCode={cashCode}
+                    supportedCash={supportedCurrencies}
+                    onCurrencyChange={this.updateCurrency}
                     onCashChange={this.updateCashValue}
                     cryptoValue={cryptoValue}
                     cryptoCode={cryptoCode}
