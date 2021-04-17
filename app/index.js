@@ -10,10 +10,12 @@ import Exchanger from "./components/Exchanger";
 class App extends React.Component {
     render() {
         return (
-            <div>
-                <Nav />
-                <Exchanger />
-            </div>
+            <React.StrictMode>
+                <div className="p-1">
+                    <Nav />
+                    <Exchanger />
+                </div>
+            </React.StrictMode>
         );
     }
 }

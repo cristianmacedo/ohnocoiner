@@ -1,18 +1,19 @@
 import React from "react";
 
-import Card from "./Card";
-import DatePicker from "./DatePicker";
-import Currency from "./Currency";
-import Loading from "./Loading";
-
-import { fetchCurrentPrice, fetchHistoricalPrice } from "../utils/api";
+import { fetchSupportedCurrencies, fetchHistoricalPrice } from "../utils/api";
 import date from "../utils/date";
+
+import CashCryptoDateInputs from "./CashCryptoDateInputs";
+import ConversionResult from "./ConversionResult";
+
+date.use();
 
 export default class Exchanger extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
+            supportedCurrencies: [],
             cashCode: "USD",
             cashValue: 0,
             cryptoCode: "BTC",
@@ -23,73 +24,54 @@ export default class Exchanger extends React.Component {
                 },
             },
             todayDate: new Date().addDays(-1).toSimple(),
-            apiFirstDate: "2010-07-17",
+            apiFirstDate: "2010-07-18",
             historicalDate: "2015-01-01",
         };
 
         this.updateCashValue = this.updateCashValue.bind(this);
         this.updateCryptoValue = this.updateCryptoValue.bind(this);
-        this.updateCurrentPrice = this.updateCurrentPrice.bind(this);
         this.updateHistoricalPrice = this.updateHistoricalPrice.bind(this);
         this.isLoading = this.isLoading.bind(this);
     }
 
     componentDidMount() {
-        this.updateCurrentPrice();
+        this.updateHistoricalPrice(this.state.todayDate);
         this.updateHistoricalPrice(this.state.historicalDate);
     }
 
     isLoading() {
-        return this.state.cryptoPrices[this.state.cryptoCode][
-            this.state.cashCode
-        ][this.state.historicalDate];
+        const {
+            cashCode,
+            historicalDate,
+            cryptoCode,
+            cryptoPrices,
+        } = this.state;
+        return historicalDate in cryptoPrices[cryptoCode][cashCode];
     }
 
-    updateCurrentPrice() {
-        const { cashCode, cryptoCode, cryptoPrices, todayDate } = this.state;
+    async updateHistoricalPrice(selectedDate) {
+        const { cashCode, cashValue, cryptoCode, cryptoPrices } = this.state;
 
-        fetchCurrentPrice(cashCode).then((data) => {
-            cryptoPrices[cryptoCode][cashCode][todayDate] =
-                data["bpi"][cashCode]["rate_float"];
-            this.setState({ cryptoPrices });
-        });
-    }
-
-    updateHistoricalPrice(selectedDate) {
-        const { cashCode, cryptoCode, cryptoPrices } = this.state;
-
-        this.setState({ historicalDate: selectedDate });
-
-        const dateExists =
-            selectedDate in this.state.cryptoPrices[cryptoCode][cashCode];
+        const dateExists = selectedDate in cryptoPrices[cryptoCode][cashCode];
 
         if (!dateExists) {
-            fetchHistoricalPrice(selectedDate)
-                .then((data) => {
-                    cryptoPrices[cryptoCode][cashCode] = {
-                        ...cryptoPrices[cryptoCode][cashCode],
-                        ...data["bpi"],
-                    };
-                    this.setState({ cryptoPrices });
-                })
-                .then(() => {
-                    this.setState({
-                        cashValue: this.state.cashValue,
-                        cryptoValue: (
-                            this.state.cashValue /
-                            cryptoPrices[cryptoCode][cashCode][selectedDate]
-                        ).toFixed(8),
-                    });
-                });
-        } else {
-            this.setState({
-                cashValue: this.state.cashValue,
-                cryptoValue: (
-                    this.state.cashValue /
-                    cryptoPrices[cryptoCode][cashCode][selectedDate]
-                ).toFixed(8),
-            });
+            const data = await fetchHistoricalPrice(selectedDate);
+            cryptoPrices[cryptoCode][cashCode] = {
+                ...cryptoPrices[cryptoCode][cashCode],
+                ...data["bpi"],
+            };
         }
+
+        this.setState({
+            cryptoPrices,
+            historicalDate: selectedDate,
+            cashValue: cashValue,
+            cryptoValue: Number(
+                (
+                    cashValue / cryptoPrices[cryptoCode][cashCode][selectedDate]
+                ).toFixed(8)
+            ),
+        });
     }
 
     updateCashValue(newValue) {
@@ -100,11 +82,13 @@ export default class Exchanger extends React.Component {
             historicalDate,
         } = this.state;
 
+        const newCrypto = (
+            newValue / cryptoPrices[cryptoCode][cashCode][historicalDate]
+        ).toFixed(8);
+
         this.setState({
-            cashValue: newValue,
-            cryptoValue: (
-                newValue / cryptoPrices[cryptoCode][cashCode][historicalDate]
-            ).toFixed(8),
+            cashValue: Number(newValue),
+            cryptoValue: Number(newCrypto),
         });
     }
 
@@ -116,11 +100,13 @@ export default class Exchanger extends React.Component {
             historicalDate,
         } = this.state;
 
+        const newCash = (
+            newValue * cryptoPrices[cryptoCode][cashCode][historicalDate]
+        ).toFixed(2);
+
         this.setState({
-            cryptoValue: newValue,
-            cashValue: (
-                newValue * cryptoPrices[cryptoCode][cashCode][historicalDate]
-            ).toFixed(2),
+            cryptoValue: Number(newValue),
+            cashValue: Number(newCash),
         });
     }
 
@@ -138,47 +124,29 @@ export default class Exchanger extends React.Component {
 
         return (
             <React.Fragment>
-                <Card>
-                    <p>If you had bought</p>
-                    <Currency
-                        name={cashCode}
-                        value={cashValue}
-                        onValueChange={(e) =>
-                            this.updateCashValue(e.target.value)
-                        }
-                    />
-                    <p className="mt-1">worth of</p>
-                    <Currency
-                        name={cryptoCode}
-                        value={cryptoValue}
-                        onValueChange={(e) =>
-                            this.updateCryptoValue(e.target.value)
-                        }
-                    />
-                    <p className="mt-1">in</p>
-                    <DatePicker
-                        name="price-date"
-                        min={apiFirstDate}
-                        max={todayDate}
-                        value={historicalDate}
-                        onDateChange={(e) =>
-                            this.updateHistoricalPrice(e.target.value)
-                        }
-                    />
-                </Card>
-                <Card>
-                    <p>Today you would have:</p>
-                    <h2 className="text-center font-size-bg">
-                        {!this.isLoading() ? (
-                            <Loading text="Loading" speed={300} />
-                        ) : (
-                            `${cashCode} ${(
-                                cryptoValue *
-                                cryptoPrices[cryptoCode][cashCode][todayDate]
-                            ).toFixed(2)}`
-                        )}
-                    </h2>
-                </Card>
+                <CashCryptoDateInputs
+                    cashValue={cashValue}
+                    cashCode={cashCode}
+                    onCashChange={this.updateCashValue}
+                    cryptoValue={cryptoValue}
+                    cryptoCode={cryptoCode}
+                    onCryptoChange={this.updateCryptoValue}
+                    historicalDate={this.updateHistoricalPrice}
+                    minDate={apiFirstDate}
+                    maxDate={todayDate}
+                    historicalDate={historicalDate}
+                    onHistoricalChange={this.updateHistoricalPrice}
+                />
+                <ConversionResult
+                    isLoading={this.isLoading}
+                    cashCode={cashCode}
+                    result={Number(
+                        (
+                            cryptoValue *
+                            cryptoPrices[cryptoCode][cashCode][todayDate]
+                        ).toFixed(2)
+                    )}
+                />
             </React.Fragment>
         );
     }

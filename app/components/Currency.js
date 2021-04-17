@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 export default function Currency({ name, value, onValueChange }) {
     return (
@@ -20,3 +21,9 @@ export default function Currency({ name, value, onValueChange }) {
         </div>
     );
 }
+
+Currency.propTypes = {
+    name: PropTypes.string,
+    value: PropTypes.number,
+    onValueChange: PropTypes.func,
+};

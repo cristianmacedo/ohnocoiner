@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 export default class Loading extends React.Component {
     constructor(props) {
@@ -27,3 +28,8 @@ export default class Loading extends React.Component {
         return <p>{this.state.content}</p>;
     }
 }
+
+Loading.propTypes = {
+    speed: PropTypes.number,
+    text: PropTypes.string,
+};
