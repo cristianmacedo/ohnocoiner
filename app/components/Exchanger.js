@@ -61,7 +61,7 @@ export default class Exchanger extends React.Component {
     }
 
     updateCurrency(selectedCurrency) {
-        const { cryptoPrices, cryptoCode, todayDate } = this.state;
+        const { cryptoPrices, cryptoCode } = this.state;
         cryptoPrices[cryptoCode][selectedCurrency] = {};
         this.setState({ cryptoPrices, cashCode: selectedCurrency }, () => {
             this.updateHistoricalPrice(this.state.todayDate);
