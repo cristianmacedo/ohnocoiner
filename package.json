@@ -1,7 +1,7 @@
 {
     "name": "ohnocoiner",
     "version": "1.0.0",
-    "description": "Historical price converter to make no-coiners realize how much money they didn't earn.",
+    "description": "Bitcoin historical price converter to make no-coiners realize how much money they didn't earn.",
     "main": "./app/index.js",
     "scripts": {
         "start": "webpack serve",

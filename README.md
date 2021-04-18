@@ -2,4 +2,8 @@
 
 ## To-do
 
--   [ ] Add loading component
+-   [x] Add loading component
+-   [ ] Timestamp
+-   [ ] Currency name on result
+-   [ ] Refresh button
+-   [ ] Coindesk rights
