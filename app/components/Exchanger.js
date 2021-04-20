@@ -18,6 +18,7 @@ export default class Exchanger extends React.Component {
 
         this.state = {
             supportedCurrencies: [],
+            timestamp: "",
             cashCode: "USD",
             cashValue: 0,
             cryptoCode: "BTC",
@@ -86,26 +87,20 @@ export default class Exchanger extends React.Component {
 
         return this.setState({
             cryptoPrices,
+            timestamp: data.time.updated,
         });
     }
 
     async updateHistoricalPrice(selectedDate) {
-        const {
-            cashCode,
-            cashValue,
-            cryptoCode,
-            cryptoPrices,
-            todayDate,
-        } = this.state;
+        const { cashCode, cashValue, cryptoCode, cryptoPrices } = this.state;
 
         const dateExists = selectedDate in cryptoPrices[cryptoCode][cashCode];
 
         if (!dateExists) {
-            let data = null;
-            data = (await fetchHistoricalPrice(selectedDate, cashCode))["bpi"];
+            var data = await fetchHistoricalPrice(selectedDate, cashCode);
             cryptoPrices[cryptoCode][cashCode] = {
                 ...cryptoPrices[cryptoCode][cashCode],
-                ...data,
+                ...data["bpi"],
             };
         }
 
@@ -163,6 +158,7 @@ export default class Exchanger extends React.Component {
             apiFirstDate,
             todayDate,
             supportedCurrencies,
+            timestamp,
         } = this.state;
 
         return (
@@ -185,6 +181,7 @@ export default class Exchanger extends React.Component {
                 <ConversionResult
                     isLoading={this.isLoading}
                     cashCode={cashCode}
+                    timestamp={timestamp}
                     result={
                         cryptoValue *
                         cryptoPrices[cryptoCode][cashCode][todayDate]

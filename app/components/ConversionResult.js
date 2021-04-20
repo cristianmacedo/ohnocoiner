@@ -6,7 +6,12 @@ import Loading from "./Loading";
 
 import CurrencyFormatter from "../utils/CurrencyFormatter";
 
-export default function ConversionResult({ isLoading, cashCode, result }) {
+export default function ConversionResult({
+    isLoading,
+    cashCode,
+    result,
+    timestamp,
+}) {
     const formatter = new CurrencyFormatter(cashCode);
 
     return (
@@ -19,6 +24,18 @@ export default function ConversionResult({ isLoading, cashCode, result }) {
                     `${formatter.format(result)}`
                 )}
             </h2>
+            <div className="flex space-between">
+                <span className="secondary">Last updated at {timestamp}</span>
+                <span className="secondary">
+                    Powered by{" "}
+                    <a
+                        href="https://www.coindesk.com/price/bitcoin"
+                        target="_blank"
+                    >
+                        CoinDesk
+                    </a>
+                </span>
+            </div>
         </Card>
     );
 }
@@ -27,4 +44,5 @@ ConversionResult.propTypes = {
     isLoading: PropTypes.func,
     cashCode: PropTypes.string,
     result: PropTypes.number,
+    timestamp: PropTypes.string,
 };

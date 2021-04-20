@@ -58,3 +58,16 @@ body {
 .mr-1 {
     margin-right: 1em;
 }
+
+.secondary {
+    font-size: 0.875em;
+    color: rgb(163, 163, 163);
+}
+
+.flex {
+    display: flex;
+}
+
+.space-between {
+    justify-content: space-between;
+}
