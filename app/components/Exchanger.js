@@ -1,6 +1,10 @@
 import React from "react";
 
-import { fetchSupportedCurrencies, fetchHistoricalPrice } from "../utils/api";
+import {
+    fetchSupportedCurrencies,
+    fetchHistoricalPrice,
+    fetchCurrentPrice,
+} from "../utils/api";
 import date from "../utils/date";
 
 import CashCryptoDateInputs from "./CashCryptoDateInputs";
@@ -23,7 +27,7 @@ export default class Exchanger extends React.Component {
                     USD: {},
                 },
             },
-            todayDate: new Date().addDays(-1).toSimple(),
+            todayDate: new Date().toSimple(),
             apiFirstDate: "2010-07-18",
             historicalDate: "2015-01-01",
         };
@@ -34,13 +38,14 @@ export default class Exchanger extends React.Component {
         this.updateSupportedCurrencies = this.updateSupportedCurrencies.bind(
             this
         );
+        this.updateCurrentPrice = this.updateCurrentPrice.bind(this);
         this.updateCurrency = this.updateCurrency.bind(this);
         this.isLoading = this.isLoading.bind(this);
     }
 
     componentDidMount() {
         this.updateSupportedCurrencies();
-        this.updateHistoricalPrice(this.state.todayDate);
+        this.updateCurrentPrice();
         this.updateHistoricalPrice(this.state.historicalDate);
     }
 
@@ -61,36 +66,55 @@ export default class Exchanger extends React.Component {
     }
 
     updateCurrency(selectedCurrency) {
-        const { cryptoPrices, cryptoCode } = this.state;
+        const { cryptoPrices, cryptoCode, historicalDate } = this.state;
         cryptoPrices[cryptoCode][selectedCurrency] = {};
         this.setState({ cryptoPrices, cashCode: selectedCurrency }, () => {
-            this.updateHistoricalPrice(this.state.todayDate);
-            this.updateHistoricalPrice(this.state.historicalDate);
+            this.updateCurrentPrice();
+            this.updateHistoricalPrice(historicalDate);
+        });
+    }
+
+    async updateCurrentPrice() {
+        const { todayDate, cryptoCode, cashCode, cryptoPrices } = this.state;
+
+        const data = await fetchCurrentPrice(cashCode);
+
+        cryptoPrices[cryptoCode][cashCode] = {
+            ...cryptoPrices[cryptoCode][cashCode],
+            [todayDate]: data["bpi"][cashCode]["rate_float"],
+        };
+
+        return this.setState({
+            cryptoPrices,
         });
     }
 
     async updateHistoricalPrice(selectedDate) {
-        const { cashCode, cashValue, cryptoCode, cryptoPrices } = this.state;
+        const {
+            cashCode,
+            cashValue,
+            cryptoCode,
+            cryptoPrices,
+            todayDate,
+        } = this.state;
 
         const dateExists = selectedDate in cryptoPrices[cryptoCode][cashCode];
 
         if (!dateExists) {
-            const data = await fetchHistoricalPrice(selectedDate, cashCode);
+            let data = null;
+            data = (await fetchHistoricalPrice(selectedDate, cashCode))["bpi"];
             cryptoPrices[cryptoCode][cashCode] = {
                 ...cryptoPrices[cryptoCode][cashCode],
-                ...data["bpi"],
+                ...data,
             };
         }
 
-        this.setState({
+        return this.setState({
             cryptoPrices,
             historicalDate: selectedDate,
             cashValue: cashValue,
-            cryptoValue: Number(
-                (
-                    cashValue / cryptoPrices[cryptoCode][cashCode][selectedDate]
-                ).toFixed(8)
-            ),
+            cryptoValue:
+                cashValue / cryptoPrices[cryptoCode][cashCode][selectedDate],
         });
     }
 
@@ -102,13 +126,12 @@ export default class Exchanger extends React.Component {
             historicalDate,
         } = this.state;
 
-        const newCrypto = (
-            newValue / cryptoPrices[cryptoCode][cashCode][historicalDate]
-        ).toFixed(8);
+        const newCrypto =
+            newValue / cryptoPrices[cryptoCode][cashCode][historicalDate];
 
         this.setState({
-            cashValue: Number(newValue),
-            cryptoValue: Number(newCrypto),
+            cashValue: newValue,
+            cryptoValue: newCrypto,
         });
     }
 
@@ -120,13 +143,12 @@ export default class Exchanger extends React.Component {
             historicalDate,
         } = this.state;
 
-        const newCash = (
-            newValue * cryptoPrices[cryptoCode][cashCode][historicalDate]
-        ).toFixed(2);
+        const newCash =
+            newValue * cryptoPrices[cryptoCode][cashCode][historicalDate];
 
         this.setState({
-            cryptoValue: Number(newValue),
-            cashValue: Number(newCash),
+            cryptoValue: newValue,
+            cashValue: newCash,
         });
     }
 
@@ -163,12 +185,10 @@ export default class Exchanger extends React.Component {
                 <ConversionResult
                     isLoading={this.isLoading}
                     cashCode={cashCode}
-                    result={Number(
-                        (
-                            cryptoValue *
-                            cryptoPrices[cryptoCode][cashCode][todayDate]
-                        ).toFixed(2)
-                    )}
+                    result={
+                        cryptoValue *
+                        cryptoPrices[cryptoCode][cashCode][todayDate]
+                    }
                 />
             </React.Fragment>
         );

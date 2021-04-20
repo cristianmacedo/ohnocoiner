@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 
 export default function CurrencyInput({
-    name,
+    currencyCode,
     value,
     onValueChange,
     currencies,
@@ -17,7 +17,7 @@ export default function CurrencyInput({
                 onChange={onValueChange}
             ></input>
             {currencies ? (
-                <select name={name} onChange={onCurrencyChange}>
+                <select name={currencyCode} onChange={onCurrencyChange}>
                     {currencies.map(({ currency, country }) => (
                         <option value={currency} key={currency}>
                             {`${currency} - ${country}`}
@@ -25,15 +25,15 @@ export default function CurrencyInput({
                     ))}
                 </select>
             ) : (
-                <span className="bold">{name}</span>
+                <span className="bold">{currencyCode}</span>
             )}
         </div>
     );
 }
 
 CurrencyInput.propTypes = {
-    name: PropTypes.string,
-    value: PropTypes.number,
+    currencyCode: PropTypes.string,
+    value: PropTypes.string,
     onValueChange: PropTypes.func,
     onCurrencyChange: PropTypes.func,
     currencies: PropTypes.array,

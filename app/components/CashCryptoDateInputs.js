@@ -24,9 +24,9 @@ export default function CashCryptoDateInputs({
             <p>If you had bought</p>
             {(cashValue === 0 || cashValue) && (
                 <CurrencyInput
-                    name={cashCode}
-                    value={cashValue}
-                    onValueChange={(e) => onCashChange(e.target.value)}
+                    currencyCode={cashCode}
+                    value={cashValue.toFixed(2)}
+                    onValueChange={(e) => onCashChange(Number(e.target.value))}
                     onCurrencyChange={(e) => onCurrencyChange(e.target.value)}
                     currencies={supportedCash}
                 />
@@ -34,9 +34,11 @@ export default function CashCryptoDateInputs({
             <p className="mt-1">worth of</p>
             {(cryptoValue === 0 || cryptoValue) && (
                 <CurrencyInput
-                    name={cryptoCode}
-                    value={cryptoValue}
-                    onValueChange={(e) => onCryptoChange(e.target.value)}
+                    currencyCode={cryptoCode}
+                    value={cryptoValue.toFixed(8)}
+                    onValueChange={(e) =>
+                        onCryptoChange(Number(e.target.value))
+                    }
                 />
             )}
             <p className="mt-1">in</p>

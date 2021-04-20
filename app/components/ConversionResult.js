@@ -1,10 +1,14 @@
 import React from "react";
-import PropTypes, { func } from "prop-types";
+import PropTypes from "prop-types";
 
 import Card from "./Card";
 import Loading from "./Loading";
 
+import CurrencyFormatter from "../utils/CurrencyFormatter";
+
 export default function ConversionResult({ isLoading, cashCode, result }) {
+    const formatter = new CurrencyFormatter(cashCode);
+
     return (
         <Card>
             <p>Today you would have:</p>
@@ -12,7 +16,7 @@ export default function ConversionResult({ isLoading, cashCode, result }) {
                 {!isLoading() ? (
                     <Loading text="Loading" speed={300} />
                 ) : (
-                    `${cashCode} ${result}`
+                    `${formatter.format(result)}`
                 )}
             </h2>
         </Card>
