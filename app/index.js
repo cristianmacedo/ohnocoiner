@@ -11,10 +11,8 @@ class App extends React.Component {
     render() {
         return (
             <React.StrictMode>
-                <div className="p-1">
-                    <Nav />
-                    <Exchanger />
-                </div>
+                <Nav />
+                <Exchanger />
             </React.StrictMode>
         );
     }

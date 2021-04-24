@@ -1,17 +1,13 @@
-html,
-body,
-#app {
-    height: 100%;
-    width: 100%;
-}
-
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-body {
+html,
+body,
+#app {
+    height: 100%;
     font-family: "Poppins", sans-serif;
     background-image: linear-gradient(0deg, #667eea 0%, #66a6ff 100%);
 }
@@ -51,6 +47,14 @@ body {
     padding: 2em;
 }
 
+.mb-1 {
+    margin-bottom: 1em;
+}
+
+.mb-2 {
+    margin-bottom: 2em;
+}
+
 .mt-1 {
     margin-top: 1em;
 }
@@ -61,13 +65,54 @@ body {
 
 .secondary {
     font-size: 0.875em;
-    color: rgb(163, 163, 163);
+    color: rgb(150, 150, 150);
+    margin-bottom: 0.5em;
 }
 
 .flex {
     display: flex;
 }
 
+.flex-column {
+    flex-direction: column;
+}
+
+.flex-row {
+    flex-direction: row;
+}
+
 .space-between {
     justify-content: space-between;
+}
+
+input,
+select {
+    border-radius: 10px;
+    background-color: #f6f6f6;
+}
+
+select {
+    padding: 1em;
+    font-weight: 700;
+    border: none;
+}
+
+input {
+    padding: 1em;
+    border: none;
+    font-size: 1.5em;
+}
+
+input:focus-visible {
+    outline: none;
+}
+
+.w-100 {
+    width: 100%;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-gap: 20px;
 }

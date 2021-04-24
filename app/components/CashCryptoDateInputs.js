@@ -21,28 +21,27 @@ export default function CashCryptoDateInputs({
 }) {
     return (
         <Card>
-            <p>If you had bought</p>
-            {(cashValue === 0 || cashValue) && (
+            <div className="grid">
                 <CurrencyInput
+                    headline="If you had bought"
                     currencyCode={cashCode}
                     value={cashValue.toFixed(2)}
                     onValueChange={(e) => onCashChange(Number(e.target.value))}
                     onCurrencyChange={(e) => onCurrencyChange(e.target.value)}
                     currencies={supportedCash}
                 />
-            )}
-            <p className="mt-1">worth of</p>
-            {(cryptoValue === 0 || cryptoValue) && (
                 <CurrencyInput
+                    headline="worth of"
                     currencyCode={cryptoCode}
                     value={cryptoValue.toFixed(8)}
                     onValueChange={(e) =>
                         onCryptoChange(Number(e.target.value))
                     }
+                    currencies={[{ currency: "BTC", country: "Bitcoin" }]}
                 />
-            )}
-            <p className="mt-1">in</p>
+            </div>
             <DatePicker
+                headline="in"
                 name="price-date"
                 min={minDate}
                 max={maxDate}
