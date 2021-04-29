@@ -6,7 +6,7 @@ import Loading from "./Loading";
 
 import CurrencyFormatter from "../utils/CurrencyFormatter";
 
-export default function ConversionResult({
+export default function ExchangeOutput({
     isLoading,
     cashCode,
     result,
@@ -40,7 +40,7 @@ export default function ConversionResult({
     );
 }
 
-ConversionResult.propTypes = {
+ExchangeOutput.propTypes = {
     isLoading: PropTypes.func,
     cashCode: PropTypes.string,
     result: PropTypes.number,

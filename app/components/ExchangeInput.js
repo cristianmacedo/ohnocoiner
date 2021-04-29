@@ -5,7 +5,7 @@ import Card from "./Card";
 import DatePicker from "./DatePicker";
 import CurrencyInput from "./CurrencyInput";
 
-export default function CashCryptoDateInputs({
+export default function ExchangeInput({
     cashValue,
     cashCode,
     onCashChange,
@@ -37,6 +37,11 @@ export default function CashCryptoDateInputs({
                     onValueChange={(e) =>
                         onCryptoChange(Number(e.target.value))
                     }
+                    onCurrencyChange={(e) =>
+                        console.warn(
+                            `Sorry, OhNoCoiner currently only supports Bitcoin.`
+                        )
+                    }
                     currencies={[{ currency: "BTC", country: "Bitcoin" }]}
                 />
             </div>
@@ -52,7 +57,7 @@ export default function CashCryptoDateInputs({
     );
 }
 
-CashCryptoDateInputs.propTypes = {
+ExchangeInput.propTypes = {
     cashValue: PropTypes.number,
     cashCode: PropTypes.string,
     onCashChange: PropTypes.func,

@@ -7,9 +7,6 @@ import {
 } from "../utils/api";
 import date from "../utils/date";
 
-import CashCryptoDateInputs from "./CashCryptoDateInputs";
-import ConversionResult from "./ConversionResult";
-
 date.use();
 
 export default class Exchanger extends React.Component {
@@ -17,7 +14,7 @@ export default class Exchanger extends React.Component {
         super(props);
 
         this.state = {
-            supportedCurrencies: [],
+            supportedCash: [],
             timestamp: "",
             cashCode: "USD",
             cashValue: 0,
@@ -62,7 +59,7 @@ export default class Exchanger extends React.Component {
 
     updateSupportedCurrencies() {
         fetchSupportedCurrencies().then((data) =>
-            this.setState({ supportedCurrencies: data })
+            this.setState({ supportedCash: data })
         );
     }
 
@@ -157,36 +154,34 @@ export default class Exchanger extends React.Component {
             historicalDate,
             apiFirstDate,
             todayDate,
-            supportedCurrencies,
+            supportedCash,
             timestamp,
         } = this.state;
 
         return (
             <React.Fragment>
-                <CashCryptoDateInputs
-                    cashValue={cashValue}
-                    cashCode={cashCode}
-                    supportedCash={supportedCurrencies}
-                    onCurrencyChange={this.updateCurrency}
-                    onCashChange={this.updateCashValue}
-                    cryptoValue={cryptoValue}
-                    cryptoCode={cryptoCode}
-                    onCryptoChange={this.updateCryptoValue}
-                    historicalDate={this.updateHistoricalPrice}
-                    minDate={apiFirstDate}
-                    maxDate={todayDate}
-                    historicalDate={historicalDate}
-                    onHistoricalChange={this.updateHistoricalPrice}
-                />
-                <ConversionResult
-                    isLoading={this.isLoading}
-                    cashCode={cashCode}
-                    timestamp={timestamp}
-                    result={
+                {this.props.input({
+                    cashValue,
+                    cashCode,
+                    cryptoValue,
+                    cryptoCode,
+                    supportedCash,
+                    historicalDate,
+                    minDate: apiFirstDate,
+                    maxDate: todayDate,
+                    onCurrencyChange: this.updateCurrency,
+                    onCashChange: this.updateCashValue,
+                    onCryptoChange: this.updateCryptoValue,
+                    onHistoricalChange: this.updateHistoricalPrice,
+                })}
+                {this.props.output({
+                    cashCode,
+                    timestamp,
+                    result:
                         cryptoValue *
-                        cryptoPrices[cryptoCode][cashCode][todayDate]
-                    }
-                />
+                        cryptoPrices[cryptoCode][cashCode][todayDate],
+                    isLoading: this.isLoading,
+                })}
             </React.Fragment>
         );
     }
