@@ -5,6 +5,9 @@ import Card from "./Card";
 import DatePicker from "./DatePicker";
 import CurrencyInput from "./CurrencyInput";
 
+/**
+ * Exchanger input section container.
+ */
 export default function ExchangeInput({
     cashValue,
     cashCode,

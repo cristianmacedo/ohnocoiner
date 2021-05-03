@@ -1,6 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
 
+/**
+ * Currency input/output handler.
+ */
 export default function CurrencyInput({
     headline,
     currencyCode,

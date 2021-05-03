@@ -1,6 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
 
+/**
+ * Animated element designed to temporary show up when some content is still loading.
+ */
 export default class Loading extends React.Component {
     constructor(props) {
         super(props);

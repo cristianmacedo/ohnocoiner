@@ -6,6 +6,9 @@ import Loading from "./Loading";
 
 import CurrencyFormatter from "../utils/CurrencyFormatter";
 
+/**
+ * Exchanger output section container.
+ */
 export default function ExchangeOutput({
     isLoading,
     cashCode,

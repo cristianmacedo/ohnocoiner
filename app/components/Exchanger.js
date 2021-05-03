@@ -1,4 +1,5 @@
 import React from "react";
+import PropTypes from "prop-types";
 
 import {
     fetchSupportedCurrencies,
@@ -9,6 +10,9 @@ import date from "../utils/date";
 
 date.use();
 
+/**
+ * Contains all the logic of the Exchanger. Passes data through render props to input/output.
+ */
 export default class Exchanger extends React.Component {
     constructor(props) {
         super(props);
@@ -186,3 +190,8 @@ export default class Exchanger extends React.Component {
         );
     }
 }
+
+Exchanger.propTypes = {
+    input: PropTypes.func,
+    output: PropTypes.func,
+};

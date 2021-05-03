@@ -1,6 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
 
+/**
+ * Date input/output handler.
+ */
 export default function DatePicker({
     headline,
     name,
