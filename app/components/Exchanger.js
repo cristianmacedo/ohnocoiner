@@ -11,7 +11,7 @@ import date from "../utils/date";
 date.use();
 
 /**
- * Contains all the logic of the Exchanger. Passes data through render props to input/output.
+ * Exchanger logic processor. Passes data through render props to input/output.
  */
 export default class Exchanger extends React.Component {
     constructor(props) {
