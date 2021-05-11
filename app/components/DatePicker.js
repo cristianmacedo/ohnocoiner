@@ -13,9 +13,10 @@ export default function DatePicker({
     onDateChange,
 }) {
     return (
-        <div className="flex flex-column">
-            <span className="secondary mb-1">{headline}</span>
+        <div className="d-flex flex-column">
+            <small className="text-secondary mb-1">{headline}</small>
             <input
+                className="mb-2 p-2 bg-light border rounded"
                 type="date"
                 id={name}
                 name={name}

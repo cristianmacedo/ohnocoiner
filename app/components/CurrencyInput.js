@@ -13,12 +13,12 @@ export default function CurrencyInput({
     onCurrencyChange,
 }) {
     return (
-        <div className="flex flex-column w-100 mb-2">
-            <span className="secondary">{headline}</span>
+        <div className="d-flex flex-column col-6 p-2">
+            <small className="text-secondary mb-1">{headline}</small>
             <select
+                className="mb-2 p-2 bg-light border rounded"
                 name={currencyCode}
                 onChange={onCurrencyChange}
-                className="mb-2"
                 value={currencyCode}
             >
                 {currencies.map(({ currency, country }) => (
@@ -27,8 +27,13 @@ export default function CurrencyInput({
                     </option>
                 ))}
             </select>
-            <span className="secondary">value</span>
-            <input type="number" value={value} onChange={onValueChange}></input>
+            <small className="text-secondary mb-1">value</small>
+            <input
+                className="mb-2 p-2 bg-light border rounded"
+                type="number"
+                value={value}
+                onChange={onValueChange}
+            ></input>
         </div>
     );
 }
