@@ -24,7 +24,7 @@ export default function ExchangeInput({
 }) {
     return (
         <Card>
-            <div className="d-flex flex-row w-100">
+            <div className="row w-100">
                 <CurrencyInput
                     headline="If you had bought"
                     currencyCode={cashCode}

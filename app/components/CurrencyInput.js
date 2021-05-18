@@ -13,7 +13,7 @@ export default function CurrencyInput({
     onCurrencyChange,
 }) {
     return (
-        <div className="d-flex flex-column col-6 p-2">
+        <div className="d-flex flex-column col col-md-6 col-sm-12 p-2">
             <small className="text-secondary mb-1">{headline}</small>
             <select
                 className="mb-2 p-2 bg-light border rounded"
