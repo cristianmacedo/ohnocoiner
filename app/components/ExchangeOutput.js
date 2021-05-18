@@ -20,13 +20,13 @@ export default function ExchangeOutput({
     return (
         <Card>
             <p>Today you would have:</p>
-            <h2 className="text-center">
+            <div className="text-center fs-1 fw-bold">
                 {!isLoading() ? (
                     <Loading text="Loading" speed={300} />
                 ) : (
                     `${formatter.format(result)}`
                 )}
-            </h2>
+            </div>
             <div className="d-flex justify-content-between">
                 <small className="text-secondary">
                     Last updated at {timestamp}
