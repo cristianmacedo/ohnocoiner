@@ -1,9 +1,9 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-import Card from "./Card";
-import DatePicker from "./DatePicker";
-import CurrencyInput from "./CurrencyInput";
+import Card from "components/Card";
+import DatePicker from "components/DatePicker";
+import CurrencyInput from "components/CurrencyInput";
 
 /**
  * Exchanger input section container.

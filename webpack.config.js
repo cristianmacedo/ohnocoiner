@@ -8,6 +8,10 @@ module.exports = {
     filename: "index.bundle.js",
     publicPath: "/",
   },
+  resolve: {
+    extensions: [".jsx", ".scss", ".js", ".json"],
+    modules: [path.resolve(__dirname, "app"), "node_modules"],
+  },
   module: {
     rules: [
       { test: /\.(js)$/, use: "babel-loader" },

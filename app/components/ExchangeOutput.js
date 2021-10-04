@@ -1,10 +1,10 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-import Card from "./Card";
-import Loading from "./Loading";
+import Card from "components/Card";
+import Loading from "components/Loading";
 
-import CurrencyFormatter from "../utils/CurrencyFormatter";
+import CurrencyFormatter from "utils/CurrencyFormatter";
 
 /**
  * Exchanger output section container.

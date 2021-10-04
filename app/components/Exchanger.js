@@ -5,8 +5,8 @@ import {
   fetchSupportedCurrencies,
   fetchHistoricalPrice,
   fetchCurrentPrice,
-} from "../utils/api";
-import date from "../utils/date";
+} from "utils/api";
+import date from "utils/date";
 
 date.use();
 
