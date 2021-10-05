@@ -1,4 +1,5 @@
 import React from "react";
+import CountUp from "react-countup";
 
 import { formatDistanceToNow } from "date-fns";
 import PropTypes from "prop-types";
@@ -7,6 +8,8 @@ import Card from "components/Card";
 import Loading from "components/Loading";
 
 import CurrencyFormatter from "utils/CurrencyFormatter";
+
+import usePrevious from "../hooks/usePrevious";
 
 /**
  * Exchanger output section container.
@@ -18,12 +21,22 @@ export default function ExchangeOutput({
   timestamp,
 }) {
   const formatter = new CurrencyFormatter(inputCurrency);
+  const previousResult = usePrevious(result);
 
   return (
     <Card>
       <div>Today you would have:</div>
       <div className="text-center fs-1 fw-bold">
-        {isLoading ? <Loading /> : `${formatter.format(result)}`}
+        {isLoading ? (
+          <Loading />
+        ) : (
+          <CountUp
+            duration={1}
+            start={previousResult}
+            end={result}
+            formattingFn={formatter.format}
+          />
+        )}
       </div>
       <div className="d-flex justify-content-between">
         <small className="text-secondary me-2">
