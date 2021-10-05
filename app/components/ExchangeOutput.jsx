@@ -34,6 +34,7 @@ export default function ExchangeOutput({
             duration={1}
             start={previousResult}
             end={result}
+            decimals={2}
             formattingFn={formatter.format}
           />
         )}
