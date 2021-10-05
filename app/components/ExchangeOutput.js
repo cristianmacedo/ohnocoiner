@@ -21,7 +21,7 @@ export default function ExchangeOutput({
     <Card>
       <p>Today you would have:</p>
       <p className="text-center fs-1 fw-bold">
-        {!isLoading() ? (
+        {isLoading ? (
           <Loading text="Loading" speed={300} />
         ) : (
           `${formatter.format(result)}`

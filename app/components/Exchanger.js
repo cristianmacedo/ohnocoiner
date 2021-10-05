@@ -1,4 +1,5 @@
 import React from "react";
+
 import PropTypes from "prop-types";
 
 import {
@@ -8,170 +9,155 @@ import {
 } from "utils/api";
 import date from "utils/date";
 
+import { API_FIRST_DATE, API_START_DATE } from "../config/constants";
+
 date.use();
+
+const INITAL_RATES = {
+  USD: {
+    BTC: {},
+  },
+};
 
 /**
  * Exchanger logic processor. Passes data through render props to input/output.
  */
-export default class Exchanger extends React.Component {
-  constructor(props) {
-    super(props);
+export default function Exchanger({ input, output }) {
+  const [supportedCurrencies, setSupportedCurrencies] = React.useState([]);
+  const [timestamp, setTimestamp] = React.useState();
+  const [inputCurrency, setInputCurrency] = React.useState("USD");
+  const [inputCurrencyValue, setInputCurrencyValue] = React.useState(0);
+  const [outputCurrency] = React.useState("BTC");
+  const [outputCurrencyValue, setOutputCurrencyValue] = React.useState(0);
+  const [rates, setRates] = React.useState({ ...INITAL_RATES });
+  const [selectedDate, setSelectedDate] = React.useState(API_START_DATE);
 
-    this.state = {
-      supportedCash: [],
-      timestamp: "",
-      cashCode: "USD",
-      cashValue: 0,
-      cryptoCode: "BTC",
-      cryptoValue: 0,
-      cryptoPrices: {
-        BTC: {
-          USD: {},
+  const today = React.useMemo(() => new Date().toSimple(), []);
+  const isLoading = React.useMemo(
+    () => !(selectedDate in rates[inputCurrency][outputCurrency]),
+    [inputCurrency, outputCurrency, rates, selectedDate]
+  );
+
+  const updateSupportedCurrencies = React.useCallback(async () => {
+    const newSupportedCurrencies = await fetchSupportedCurrencies();
+    setSupportedCurrencies(newSupportedCurrencies);
+  }, []);
+
+  const updateRates = React.useCallback(
+    async (newSelectedDate, newInputCurrency, newOutputCurrency) => {
+      let selectedDateRate =
+        rates[newInputCurrency][newOutputCurrency][newSelectedDate];
+      const dateExists =
+        newSelectedDate in rates[newInputCurrency][newOutputCurrency];
+
+      if (!dateExists) {
+        const selectedDateRateData = await fetchHistoricalPrice(
+          newSelectedDate,
+          newInputCurrency,
+          newOutputCurrency
+        );
+        selectedDateRate = selectedDateRateData.bpi[newSelectedDate];
+      }
+
+      const todayRateData = await fetchCurrentPrice(newInputCurrency);
+      const todayRate = todayRateData.bpi[newInputCurrency].rate_float;
+      const newTimestamp = todayRateData.time.updated;
+
+      const newRates = {
+        ...rates,
+        [newInputCurrency]: {
+          ...rates[newInputCurrency],
+          [newOutputCurrency]: {
+            ...rates[newInputCurrency][newOutputCurrency],
+            [newSelectedDate]: selectedDateRate,
+            [today]: todayRate,
+          },
         },
-      },
-      todayDate: new Date().toSimple(),
-      apiFirstDate: "2010-07-18",
-      historicalDate: "2015-01-01",
-    };
-
-    this.updateCashValue = this.updateCashValue.bind(this);
-    this.updateCryptoValue = this.updateCryptoValue.bind(this);
-    this.updateHistoricalPrice = this.updateHistoricalPrice.bind(this);
-    this.updateSupportedCurrencies = this.updateSupportedCurrencies.bind(this);
-    this.updateCurrentPrice = this.updateCurrentPrice.bind(this);
-    this.updateCurrency = this.updateCurrency.bind(this);
-    this.isLoading = this.isLoading.bind(this);
-  }
-
-  componentDidMount() {
-    this.updateSupportedCurrencies();
-    this.updateCurrentPrice();
-    this.updateHistoricalPrice(this.state.historicalDate);
-  }
-
-  isLoading() {
-    const { cashCode, historicalDate, cryptoCode, cryptoPrices } = this.state;
-    return historicalDate in cryptoPrices[cryptoCode][cashCode];
-  }
-
-  updateSupportedCurrencies() {
-    fetchSupportedCurrencies().then((data) =>
-      this.setState({ supportedCash: data })
-    );
-  }
-
-  updateCurrency(selectedCurrency) {
-    const { cryptoPrices, cryptoCode, historicalDate } = this.state;
-    cryptoPrices[cryptoCode][selectedCurrency] = {};
-    this.setState({ cryptoPrices, cashCode: selectedCurrency }, () => {
-      this.updateCurrentPrice();
-      this.updateHistoricalPrice(historicalDate);
-    });
-  }
-
-  async updateCurrentPrice() {
-    const { todayDate, cryptoCode, cashCode, cryptoPrices } = this.state;
-
-    const data = await fetchCurrentPrice(cashCode);
-
-    cryptoPrices[cryptoCode][cashCode] = {
-      ...cryptoPrices[cryptoCode][cashCode],
-      [todayDate]: data["bpi"][cashCode]["rate_float"],
-    };
-
-    return this.setState({
-      cryptoPrices,
-      timestamp: data.time.updated,
-    });
-  }
-
-  async updateHistoricalPrice(selectedDate) {
-    const { cashCode, cashValue, cryptoCode, cryptoPrices } = this.state;
-
-    const dateExists = selectedDate in cryptoPrices[cryptoCode][cashCode];
-
-    if (!dateExists) {
-      var data = await fetchHistoricalPrice(selectedDate, cashCode);
-      cryptoPrices[cryptoCode][cashCode] = {
-        ...cryptoPrices[cryptoCode][cashCode],
-        ...data["bpi"],
       };
-    }
 
-    return this.setState({
-      cryptoPrices,
-      historicalDate: selectedDate,
-      cashValue: cashValue,
-      cryptoValue: cashValue / cryptoPrices[cryptoCode][cashCode][selectedDate],
-    });
-  }
+      setRates(newRates);
+      setTimestamp(newTimestamp);
 
-  updateCashValue(newValue) {
-    const { cashCode, cryptoCode, cryptoPrices, historicalDate } = this.state;
+      setOutputCurrencyValue(
+        inputCurrencyValue /
+          newRates[newInputCurrency][newOutputCurrency][newSelectedDate]
+      );
+    },
+    [inputCurrencyValue, rates, today]
+  );
 
-    const newCrypto =
-      newValue / cryptoPrices[cryptoCode][cashCode][historicalDate];
+  const handleSelectedDateChange = React.useCallback(
+    (newSelectedDate) => {
+      setSelectedDate(newSelectedDate);
+      updateRates(newSelectedDate, inputCurrency, outputCurrency);
+    },
+    [inputCurrency, outputCurrency, updateRates]
+  );
 
-    this.setState({
-      cashValue: newValue,
-      cryptoValue: newCrypto,
-    });
-  }
+  const handleInputCurrencyChange = React.useCallback(
+    (newInputCurrency) => {
+      setInputCurrency(newInputCurrency);
+      updateRates(selectedDate, newInputCurrency, outputCurrency);
+    },
+    [outputCurrency, selectedDate, updateRates]
+  );
 
-  updateCryptoValue(newValue) {
-    const { cashCode, cryptoCode, cryptoPrices, historicalDate } = this.state;
+  const handleInputCurrencyValueChange = React.useCallback(
+    (newInputCurrencyValue) => {
+      setInputCurrencyValue(newInputCurrencyValue);
+      setOutputCurrencyValue(
+        newInputCurrencyValue /
+          rates[inputCurrency][outputCurrency][selectedDate]
+      );
+    },
+    [inputCurrency, outputCurrency, rates, selectedDate]
+  );
 
-    const newCash =
-      newValue * cryptoPrices[cryptoCode][cashCode][historicalDate];
+  const handleOutputCurrencyValueChange = React.useCallback(
+    (newOutputCurrencyValue) => {
+      setOutputCurrencyValue(newOutputCurrencyValue);
+      setInputCurrencyValue(
+        newOutputCurrencyValue *
+          rates[inputCurrency][outputCurrency][selectedDate]
+      );
+    },
+    [inputCurrency, outputCurrency, rates, selectedDate]
+  );
 
-    this.setState({
-      cryptoValue: newValue,
-      cashValue: newCash,
-    });
-  }
+  React.useEffect(() => {
+    updateSupportedCurrencies();
+    updateRates(selectedDate, inputCurrency, outputCurrency);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inputCurrency, outputCurrency, selectedDate]);
 
-  render() {
-    const {
-      cashCode,
-      cashValue,
-      cryptoCode,
-      cryptoValue,
-      cryptoPrices,
-      historicalDate,
-      apiFirstDate,
-      todayDate,
-      supportedCash,
-      timestamp,
-    } = this.state;
-
-    return (
-      <React.Fragment>
-        {this.props.input({
-          cashValue,
-          cashCode,
-          cryptoValue,
-          cryptoCode,
-          supportedCash,
-          historicalDate,
-          minDate: apiFirstDate,
-          maxDate: todayDate,
-          onCurrencyChange: this.updateCurrency,
-          onCashChange: this.updateCashValue,
-          onCryptoChange: this.updateCryptoValue,
-          onHistoricalChange: this.updateHistoricalPrice,
-        })}
-        {this.props.output({
-          cashCode,
-          timestamp,
-          result: cryptoValue * cryptoPrices[cryptoCode][cashCode][todayDate],
-          isLoading: this.isLoading,
-        })}
-      </React.Fragment>
-    );
-  }
+  return (
+    <>
+      {input({
+        cashValue: inputCurrencyValue,
+        cashCode: inputCurrency,
+        cryptoValue: outputCurrencyValue,
+        cryptoCode: outputCurrency,
+        supportedCash: supportedCurrencies,
+        historicalDate: selectedDate,
+        minDate: API_FIRST_DATE,
+        maxDate: today,
+        onCurrencyChange: handleInputCurrencyChange,
+        onCashChange: handleInputCurrencyValueChange,
+        onCryptoChange: handleOutputCurrencyValueChange,
+        onHistoricalChange: handleSelectedDateChange,
+      })}
+      {output({
+        cashCode: inputCurrency,
+        timestamp,
+        result:
+          outputCurrencyValue * rates[inputCurrency][outputCurrency][today],
+        isLoading,
+      })}
+    </>
+  );
 }
 
 Exchanger.propTypes = {
-  input: PropTypes.func,
-  output: PropTypes.func,
+  input: PropTypes.func.isRequired,
+  output: PropTypes.func.isRequired,
 };

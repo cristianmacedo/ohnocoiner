@@ -198,9 +198,13 @@ export async function fetchCurrentPrice(code) {
   return data;
 }
 
-export async function fetchHistoricalPrice(date, currency) {
+export async function fetchHistoricalPrice(
+  date,
+  inputCurrency,
+  outputCurrency
+) {
   const endpoint = window.encodeURI(
-    `https://api.coindesk.com/v1/bpi/historical/close.json?start=${date}&end=${date}&currency=${currency}`
+    `https://api.coindesk.com/v1/bpi/historical/close.json?start=${date}&end=${date}&currency=${inputCurrency}`
   );
 
   const res = await fetch(endpoint);
