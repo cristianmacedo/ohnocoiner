@@ -1,8 +1,8 @@
 export default class CurrencyFormatter extends Intl.NumberFormat {
-  constructor(cashCode) {
+  constructor(currency) {
     super("en-US", {
+      currency,
       style: "currency",
-      currency: cashCode,
     });
   }
 }

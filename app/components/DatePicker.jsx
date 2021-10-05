@@ -1,4 +1,5 @@
 import React from "react";
+
 import PropTypes from "prop-types";
 
 /**
@@ -24,15 +25,16 @@ export default function DatePicker({
         max={max}
         value={value}
         onChange={onDateChange}
-      ></input>
+      />
     </div>
   );
 }
 
 DatePicker.propTypes = {
-  name: PropTypes.string,
-  min: PropTypes.string,
-  max: PropTypes.string,
-  value: PropTypes.string,
-  onDateChange: PropTypes.func,
+  headline: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  min: PropTypes.string.isRequired,
+  max: PropTypes.string.isRequired,
+  value: PropTypes.string.isRequired,
+  onDateChange: PropTypes.func.isRequired,
 };

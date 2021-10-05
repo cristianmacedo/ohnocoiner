@@ -1,5 +1,5 @@
-const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const path = require("path");
 
 module.exports = {
   entry: "./app/index.js",
@@ -9,12 +9,13 @@ module.exports = {
     publicPath: "/",
   },
   resolve: {
-    extensions: [".jsx", ".scss", ".js", ".json"],
+    extensions: [".scss", ".js", ".jsx", ".json"],
     modules: [path.resolve(__dirname, "app"), "node_modules"],
   },
   module: {
     rules: [
       { test: /\.(js)$/, use: "babel-loader" },
+      { test: /\.(jsx)$/, use: "babel-loader" },
       { test: /\.(css)$/, use: ["style-loader", "css-loader"] },
     ],
   },

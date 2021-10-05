@@ -1,4 +1,5 @@
 import React from "react";
+
 import PropTypes from "prop-types";
 
 /**
@@ -6,7 +7,7 @@ import PropTypes from "prop-types";
  */
 export default function CurrencyInput({
   headline,
-  currencyCode,
+  currency,
   value,
   onValueChange,
   currencies,
@@ -17,13 +18,13 @@ export default function CurrencyInput({
       <small className="text-secondary mb-1">{headline}</small>
       <select
         className="mb-2 p-2 bg-light border rounded"
-        name={currencyCode}
+        name={currency}
         onChange={onCurrencyChange}
-        value={currencyCode}
+        value={currency}
       >
-        {currencies.map(({ currency, country }) => (
-          <option value={currency} key={currency}>
-            {`${currency} - ${country}`}
+        {currencies.map((item) => (
+          <option value={item.currency} key={item.currency}>
+            {`${item.currency} - ${item.country}`}
           </option>
         ))}
       </select>
@@ -33,15 +34,21 @@ export default function CurrencyInput({
         type="number"
         value={value}
         onChange={onValueChange}
-      ></input>
+      />
     </div>
   );
 }
 
 CurrencyInput.propTypes = {
-  currencyCode: PropTypes.string,
-  value: PropTypes.string,
-  onValueChange: PropTypes.func,
-  onCurrencyChange: PropTypes.func,
-  currencies: PropTypes.array,
+  headline: PropTypes.string.isRequired,
+  currency: PropTypes.string.isRequired,
+  value: PropTypes.string.isRequired,
+  onValueChange: PropTypes.func.isRequired,
+  onCurrencyChange: PropTypes.func.isRequired,
+  currencies: PropTypes.arrayOf(
+    PropTypes.shape({
+      currency: PropTypes.string.isRequired,
+      country: PropTypes.string.isRequired,
+    })
+  ).isRequired,
 };

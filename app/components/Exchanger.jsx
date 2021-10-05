@@ -1,17 +1,19 @@
 import React from "react";
 
+import { format } from "date-fns";
 import PropTypes from "prop-types";
 
 import {
   fetchSupportedCurrencies,
-  fetchHistoricalPrice,
-  fetchCurrentPrice,
+  fetchRate,
+  fetchCurrentRate,
 } from "utils/api";
-import date from "utils/date";
 
-import { API_FIRST_DATE, API_START_DATE } from "../config/constants";
-
-date.use();
+import {
+  API_FIRST_DATE,
+  API_START_DATE,
+  API_DATE_FORMAT,
+} from "config/constants";
 
 const INITAL_RATES = {
   USD: {
@@ -32,7 +34,7 @@ export default function Exchanger({ input, output }) {
   const [rates, setRates] = React.useState({ ...INITAL_RATES });
   const [selectedDate, setSelectedDate] = React.useState(API_START_DATE);
 
-  const today = React.useMemo(() => new Date().toSimple(), []);
+  const today = React.useMemo(() => format(new Date(), API_DATE_FORMAT), []);
   const isLoading = React.useMemo(
     () => !(selectedDate in rates[inputCurrency][outputCurrency]),
     [inputCurrency, outputCurrency, rates, selectedDate]
@@ -51,7 +53,7 @@ export default function Exchanger({ input, output }) {
         newSelectedDate in rates[newInputCurrency][newOutputCurrency];
 
       if (!dateExists) {
-        const selectedDateRateData = await fetchHistoricalPrice(
+        const selectedDateRateData = await fetchRate(
           newSelectedDate,
           newInputCurrency,
           newOutputCurrency
@@ -59,9 +61,9 @@ export default function Exchanger({ input, output }) {
         selectedDateRate = selectedDateRateData.bpi[newSelectedDate];
       }
 
-      const todayRateData = await fetchCurrentPrice(newInputCurrency);
+      const todayRateData = await fetchCurrentRate(newInputCurrency);
       const todayRate = todayRateData.bpi[newInputCurrency].rate_float;
-      const newTimestamp = todayRateData.time.updated;
+      const newTimestamp = todayRateData.time.updatedISO;
 
       const newRates = {
         ...rates,
@@ -133,21 +135,21 @@ export default function Exchanger({ input, output }) {
   return (
     <>
       {input({
-        cashValue: inputCurrencyValue,
-        cashCode: inputCurrency,
-        cryptoValue: outputCurrencyValue,
-        cryptoCode: outputCurrency,
+        inputCurrencyValue: inputCurrencyValue,
+        inputCurrency,
+        outputCurrencyValue,
+        outputCurrency,
         supportedCash: supportedCurrencies,
-        historicalDate: selectedDate,
+        selectedDate,
         minDate: API_FIRST_DATE,
         maxDate: today,
-        onCurrencyChange: handleInputCurrencyChange,
-        onCashChange: handleInputCurrencyValueChange,
-        onCryptoChange: handleOutputCurrencyValueChange,
-        onHistoricalChange: handleSelectedDateChange,
+        onInputCurrencyChange: handleInputCurrencyChange,
+        onInputCurrencyValueChange: handleInputCurrencyValueChange,
+        onOutputCurrencyValueChange: handleOutputCurrencyValueChange,
+        onSelectedDateChange: handleSelectedDateChange,
       })}
       {output({
-        cashCode: inputCurrency,
+        inputCurrency,
         timestamp,
         result:
           outputCurrencyValue * rates[inputCurrency][outputCurrency][today],

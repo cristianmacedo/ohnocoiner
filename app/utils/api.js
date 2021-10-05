@@ -185,31 +185,27 @@ export async function fetchSupportedCurrencies() {
   return data;
 }
 
-export async function fetchCurrentPrice(code) {
-  const endpoint = window.encodeURI(
+export async function fetchCurrentRate(code) {
+  const endpoint = global.window.encodeURI(
     `https://api.coindesk.com/v1/bpi/currentprice/${code}.json`
   );
 
-  const res = await fetch(endpoint);
+  const res = await global.fetch(endpoint);
   const data = await res.json();
-  if (data == errorMessage) {
+  if (data === errorMessage) {
     throw new Error(errorMessage);
   }
   return data;
 }
 
-export async function fetchHistoricalPrice(
-  date,
-  inputCurrency,
-  outputCurrency
-) {
-  const endpoint = window.encodeURI(
+export async function fetchRate(date, inputCurrency) {
+  const endpoint = global.window.encodeURI(
     `https://api.coindesk.com/v1/bpi/historical/close.json?start=${date}&end=${date}&currency=${inputCurrency}`
   );
 
-  const res = await fetch(endpoint);
+  const res = await global.fetch(endpoint);
   const data = await res.json();
-  if (data == errorMessage) {
+  if (data === errorMessage) {
     throw new Error(errorMessage);
   }
   return data;
