@@ -15,12 +15,6 @@ import {
   API_DATE_FORMAT,
 } from "config/constants";
 
-const INITAL_RATES = {
-  USD: {
-    BTC: {},
-  },
-};
-
 /**
  * Exchanger logic processor. Passes data through render props to input/output.
  */
@@ -31,8 +25,10 @@ export default function Exchanger({ input, output }) {
   const [inputCurrencyValue, setInputCurrencyValue] = React.useState(0);
   const [outputCurrency] = React.useState("BTC");
   const [outputCurrencyValue, setOutputCurrencyValue] = React.useState(0);
-  const [rates, setRates] = React.useState({ ...INITAL_RATES });
   const [selectedDate, setSelectedDate] = React.useState(API_START_DATE);
+  const [rates, setRates] = React.useState({
+    [inputCurrency]: { [outputCurrency]: {} },
+  });
 
   const today = React.useMemo(() => format(new Date(), API_DATE_FORMAT), []);
   const isLoading = React.useMemo(
@@ -47,6 +43,13 @@ export default function Exchanger({ input, output }) {
 
   const updateRates = React.useCallback(
     async (newSelectedDate, newInputCurrency, newOutputCurrency) => {
+      if (!(newInputCurrency in rates)) {
+        rates[newInputCurrency] = {};
+        if (!(newOutputCurrency in rates[newInputCurrency])) {
+          rates[newInputCurrency][newOutputCurrency] = {};
+        }
+      }
+
       let selectedDateRate =
         rates[newInputCurrency][newOutputCurrency][newSelectedDate];
       const dateExists =
@@ -135,7 +138,7 @@ export default function Exchanger({ input, output }) {
   return (
     <>
       {input({
-        inputCurrencyValue: inputCurrencyValue,
+        inputCurrencyValue,
         inputCurrency,
         outputCurrencyValue,
         outputCurrency,

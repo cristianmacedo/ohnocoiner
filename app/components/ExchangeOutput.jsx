@@ -7,9 +7,9 @@ import PropTypes from "prop-types";
 import Card from "components/Card";
 import Loading from "components/Loading";
 
-import CurrencyFormatter from "utils/CurrencyFormatter";
+import usePrevious from "hooks/usePrevious";
 
-import usePrevious from "../hooks/usePrevious";
+import CurrencyFormatter from "utils/CurrencyFormatter";
 
 /**
  * Exchanger output section container.
