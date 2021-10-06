@@ -5,11 +5,14 @@ import { formatDistanceToNow } from "date-fns";
 import PropTypes from "prop-types";
 
 import Card from "components/Card";
+import Indicator from "components/Indicator";
 import Loading from "components/Loading";
 
 import usePrevious from "hooks/usePrevious";
 
-import CurrencyFormatter from "utils/CurrencyFormatter";
+import formatter from "utils/formatter";
+
+import { DEFAULT_PRECISION } from "config/constants";
 
 /**
  * Exchanger output section container.
@@ -17,26 +20,40 @@ import CurrencyFormatter from "utils/CurrencyFormatter";
 export default function ExchangeOutput({
   isLoading,
   inputCurrency,
+  inputCurrencyValue,
   result,
   timestamp,
 }) {
-  const formatter = new CurrencyFormatter(inputCurrency);
-  const previousResult = usePrevious(result);
+  const currencyFormatter = formatter.currency(inputCurrency);
+  const previousResult = usePrevious(result) || 0;
 
   return (
     <Card>
       <div>Today you would have:</div>
-      <div className="text-center fs-1 fw-bold">
+      <div className="d-flex justify-content-center align-items-center">
         {isLoading ? (
           <Loading />
         ) : (
-          <CountUp
-            duration={1}
-            start={previousResult}
-            end={result}
-            decimals={2}
-            formattingFn={formatter.format}
-          />
+          <div className="position-relative">
+            <span className="fs-1 fw-bold">
+              <CountUp
+                duration={1}
+                start={previousResult}
+                end={result}
+                decimals={DEFAULT_PRECISION}
+                formattingFn={currencyFormatter}
+              />
+            </span>
+            <span className="ms-2 position-absolute top-50 start-100 translate-middle-y">
+              {inputCurrencyValue !== 0 && (
+                <Indicator
+                  start={inputCurrencyValue}
+                  end={result}
+                  precision={DEFAULT_PRECISION}
+                />
+              )}
+            </span>
+          </div>
         )}
       </div>
       <div className="d-flex justify-content-between">
@@ -63,6 +80,7 @@ export default function ExchangeOutput({
 ExchangeOutput.propTypes = {
   isLoading: PropTypes.func.isRequired,
   inputCurrency: PropTypes.string.isRequired,
+  inputCurrencyValue: PropTypes.number.isRequired,
   result: PropTypes.number.isRequired,
   timestamp: PropTypes.string.isRequired,
 };

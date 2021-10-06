@@ -13,6 +13,13 @@ export default function DatePicker({
   value,
   onDateChange,
 }) {
+  const handleValueChange = React.useCallback(
+    (event) => {
+      onDateChange(event.target.value);
+    },
+    [onDateChange]
+  );
+
   return (
     <div className="d-flex flex-column">
       <small className="text-secondary mb-1">{headline}</small>
@@ -24,7 +31,7 @@ export default function DatePicker({
         min={min}
         max={max}
         value={value}
-        onChange={onDateChange}
+        onChange={handleValueChange}
       />
     </div>
   );

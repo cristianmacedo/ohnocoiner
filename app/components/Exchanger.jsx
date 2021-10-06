@@ -35,6 +35,10 @@ export default function Exchanger({ input, output }) {
     () => !(selectedDate in rates[inputCurrency][outputCurrency]),
     [inputCurrency, outputCurrency, rates, selectedDate]
   );
+  const result = React.useMemo(
+    () => outputCurrencyValue * rates[inputCurrency][outputCurrency][today],
+    [inputCurrency, outputCurrency, outputCurrencyValue, rates, today]
+  );
 
   const updateSupportedCurrencies = React.useCallback(async () => {
     const newSupportedCurrencies = await fetchSupportedCurrencies();
@@ -142,7 +146,7 @@ export default function Exchanger({ input, output }) {
         inputCurrency,
         outputCurrencyValue,
         outputCurrency,
-        supportedCash: supportedCurrencies,
+        supportedCurrencies,
         selectedDate,
         minDate: API_FIRST_DATE,
         maxDate: today,
@@ -153,9 +157,9 @@ export default function Exchanger({ input, output }) {
       })}
       {output({
         inputCurrency,
+        inputCurrencyValue,
         timestamp,
-        result:
-          outputCurrencyValue * rates[inputCurrency][outputCurrency][today],
+        result,
         isLoading,
       })}
     </>

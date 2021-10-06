@@ -6,6 +6,11 @@ import Card from "components/Card";
 import CurrencyInput from "components/CurrencyInput";
 import DatePicker from "components/DatePicker";
 
+import {
+  INPUT_CURRENCY_PRECISION,
+  OUTPUT_CURRENCY_PRECISION,
+} from "config/constants";
+
 /**
  * Exchanger input section container.
  */
@@ -13,7 +18,7 @@ export default function ExchangeInput({
   inputCurrencyValue,
   inputCurrency,
   onInputCurrencyValueChange,
-  supportedCash,
+  supportedCurrencies,
   onInputCurrencyChange,
   outputCurrencyValue,
   outputCurrency,
@@ -25,27 +30,25 @@ export default function ExchangeInput({
 }) {
   return (
     <Card>
-      <div className="row mb-4">
+      <div className="row">
         <div className="col col-md-6 col-sm-12">
           <CurrencyInput
             headline="If you had bought"
             currency={inputCurrency}
-            value={inputCurrencyValue.toFixed(2)}
-            onValueChange={(e) =>
-              onInputCurrencyValueChange(Number(e.target.value))
-            }
-            onCurrencyChange={(e) => onInputCurrencyChange(e.target.value)}
-            currencies={supportedCash}
+            value={inputCurrencyValue}
+            precision={INPUT_CURRENCY_PRECISION}
+            onValueChange={onInputCurrencyValueChange}
+            onCurrencyChange={onInputCurrencyChange}
+            currencies={supportedCurrencies}
           />
         </div>
         <div className="col col-md-6 col-sm-12">
           <CurrencyInput
             headline="worth of"
             currency={outputCurrency}
-            value={outputCurrencyValue.toFixed(8)}
-            onValueChange={(e) =>
-              onOutputCurrencyValueChange(Number(e.target.value))
-            }
+            value={outputCurrencyValue}
+            precision={OUTPUT_CURRENCY_PRECISION}
+            onValueChange={onOutputCurrencyValueChange}
             onCurrencyChange={() =>
               global.alert(`Sorry, OhNoCoiner currently only supports Bitcoin.`)
             }
@@ -53,6 +56,7 @@ export default function ExchangeInput({
           />
         </div>
       </div>
+      <hr />
       <div className="row">
         <div className="col">
           <DatePicker
@@ -61,7 +65,7 @@ export default function ExchangeInput({
             min={minDate}
             max={maxDate}
             value={selectedDate}
-            onDateChange={(e) => onSelectedDateChange(e.target.value)}
+            onDateChange={onSelectedDateChange}
           />
         </div>
       </div>
@@ -70,14 +74,14 @@ export default function ExchangeInput({
 }
 
 ExchangeInput.propTypes = {
-  supportedCash: PropTypes.arrayOf(
+  supportedCurrencies: PropTypes.arrayOf(
     PropTypes.shape({
       currency: PropTypes.string.isRequired,
       country: PropTypes.string.isRequired,
     })
   ).isRequired,
-  inputCurrencyValue: PropTypes.number.isRequired,
   inputCurrency: PropTypes.string.isRequired,
+  inputCurrencyValue: PropTypes.number.isRequired,
   onInputCurrencyChange: PropTypes.func.isRequired,
   onInputCurrencyValueChange: PropTypes.func.isRequired,
   outputCurrency: PropTypes.string.isRequired,
